@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table {
+  border-collapse: collapse;
+  width: 320px;
+  height: 320px;
+}
+
+td {
+  border: 1px solid black;
+  width: 40px;
+  height: 40px;
+}
+
+.path {
+  background-color: yellow;
+}
+</style>
+</head>
+<body>
+
+<table id="chessboard">
+</table>
+
+<script>
+// Hàm tạo bàn cờ vua 8x8
+function createChessboard() {
+    var chessboard = document.getElementById("chessboard");
+    for (var i = 0; i < 8; i++) {
+        var row = document.createElement("tr");
+        for (var j = 0; j < 8; j++) {
+            var cell = document.createElement("td");
+            cell.setAttribute("id", i + "-" + j);
+            row.appendChild(cell);
+        }
+        chessboard.appendChild(row);
+    }
+}
+
+// Hàm kiểm tra ô có hợp lệ để di chuyển đến hay không
+function isValidMove(x, y, visited) {
+    if (x >= 0 && x < 8 && y >= 0 && y < 8 && !visited[x][y]) {
+        return true;
+    }
+    return false;
+}
+
+// Hàm tìm đường đi của con mã
+function findPath() {
+    createChessboard();
+
+    var chessboard = document.getElementById("chessboard");
+    var visited = new Array(8); // mảng 2 chiều lưu các ô đã đi qua
+    for (var i = 0; i < 8; i++) {
+        visited[i] = new Array(8).fill(false);
+    }
+
+    var dx = [1, 2, 2, 1, -1, -2, -2, -1]; // tọa độ dòng của các ô xung quanh
+    var dy = [2, 1, -1, -2, -2, -1, 1, 2]; // tọa độ cột của các ô xung quanh
+
+    function solve(x, y, move) {
+        document.getElementById(x + "-" + y).classList.add("path");
+        visited[x][y] = true;
+        chessboard.rows[x].cells[y].innerHTML = move;
+
+        if (move === 64) {
+            return true; // đã đi qua tất cả các ô
+        }
+
+        for (var i = 0; i < 8; i++) {
+            var nextX = x + dx[i];
+            var nextY = y + dy[i];
+
+            if (isValidMove(nextX, nextY, visited)) {
+                if (solve(nextX, nextY, move + 1)) {
+                    return true;
+                }
+            }
+        }
+
+        visited[x][y] = false;
+        document.getElementById(x + "-" + y).classList.remove("path");
+        chessboard.rows[x].cells[y].innerHTML = "";
+
+        return false;
+    }
+
+    solve(0, 0, 1);
+}
+
+// Gọi hàm tìm đường đi của con mã khi trang web tải xong
+window.onload = findPath;
+</script>
+
+</body>
+</html>

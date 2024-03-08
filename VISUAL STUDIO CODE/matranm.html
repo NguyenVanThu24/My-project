@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+         table {
+            border-collapse: collapse;
+         }
+         td {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            border: 1px solid black;
+         }
+    </style>
+</head>
+<body>
+    <h1>Tìm đường đi ngắn nhất trong ma trận</h1>
+    <div id="matrix"></div>
+    <button onclick="findShortestPath()">Tìm đường đi ngắn nhất</button>
+    <div id="output"></div>
+
+    <script>
+        var matrix = [[1, 1, 1, 1, 1],
+                      [1, 0, 1, 1, 1],
+                      [1, 1, 1, 0, 1],
+                      [1, 0, 0, 1, 1],
+                      [1, 1, 1, 1, 1]];
+        var numRows = matrix.length;
+        var numCols = matrix[0].length;
+
+        function createMatrix() {
+            var table = document.createElement('table');
+            for (var i = 0; i < numRows; i++) {
+                var row = document.createElement('tr');
+                for (var j = 0; j < numCols; j++) {
+                    var cell = document.createElement('td');
+                    cell.innerText = matrix[i][j];
+                    row.appendChild(cell);
+                }
+                table.appendChild(row);
+            }
+            document.getElementById('matrix').appendChild(table);
+        }
+        
+        function findShortestPath() {
+            var startRow = 0; // Vị trí dòng ban đầu
+            var startCol = 0; // Vị trí cột ban đầu
+            var endRow = 3; // Vị trí dòng đích
+            var endCol = 4; // Vị trí cột đích
+
+            var openList = [{row: startRow, col: startCol, f: 0, g: 0, h: 0, parent: null}]; // Danh sách các ô chờ kiểm tra
+            var closedList = []; // Danh sách các ô đã kiểm tra
+            
+            while (openList.length > 0) {
+                var current = openList[0];
+                var currentIndex = 0;
+                for (var i = 1; i < openList.length; i++) {
+                    if (openList[i].f < current.f || (openList[i].f === current.f && openList[i].h < current.h)) {
+                        current = openList[i];
+                        currentIndex = i;
+                    }
+                }
+                
+                openList.splice(currentIndex, 1);
+                closedList.push(current);
+                
+                if (current.row === endRow && current.col === endCol) {
+                    var path = [];
+                    var temp = current;
+                    while (temp !== null) {
+                        path.push({row: temp.row, col: temp.col});
+                        temp = temp.parent;
+                    }
+                    path.reverse();
+                    for (var i = 0; i < path.length; i++) {
+                        var row = path[i].row;
+                        var col = path[i].col;
+                        document.getElementById('matrix').getElementsByTagName('tr')[row].getElementsByTagName('td')[col].style.backgroundColor = 'yellow';
+                    }
+                    document.getElementById('output').innerText = `Đường đi ngắn nhất có độ dài ${current.g}`;
+                    return;
+                }
+                
+                var neighbors = [];
+                var row = current.row;
+                var col = current.col;
+                if (row > 0) neighbors.push({row: row - 1, col: col});
+                if (row < numRows - 1) neighbors.push({row: row + 1, col: col});
+                if (col > 0) neighbors.push({row: row, col: col - 1});
+                if (col < numCols - 1) neighbors.push({row: row, col: col + 1});
+                
+                for (var i = 0; i < neighbors.length; i++) {
+                    var neighbor = neighbors[i];
+                    if (matrix[neighbor.row][neighbor.col] === 0) continue; // Skip nếu ô là vật cản
+                    
+                    var gScore = current.g + 1; // Khoảng cách từ ô bắt đầu đến ô hiện tại
+                    var hScore = Math.abs(neighbor.row - endRow) + Math.abs(neighbor.col - endCol); // Khoảng cách từ ô hiện tại đến ô đích
+                    var fScore = gScore + hScore; // Độ ưu tiên
+                    
+                    var inOpenList = false;
+                    var inClosedList = false;
+                    for (var j = 0; j < openList.length; j++) {
+                        if (openList[j].row === neighbor.row && openList[j].col === neighbor.col) {
+                            inOpenList = true;
+                            if (gScore < openList[j].g) {
+                                openList[j].f = fScore;
+                                openList[j].g = gScore;
+                                openList[j].h = hScore;
+                                openList[j].parent = current;
+                            }
+                        }
+                    }
+                    for (var j = 0; j < closedList.length; j++) {
+                        if (closedList[j].row === neighbor.row && closedList[j].col === neighbor.col) {
+                            inClosedList = true;
+                        }
+                    }
+                    
+                    if (!inOpenList && !inClosedList) {
+                        openList.push({row: neighbor.row, col: neighbor.col, f: fScore, g: gScore, h: hScore, parent: current});
+                    }
+                }
+            }
+        }
+
+        createMatrix();
+    </script>
+</body>
+</html>

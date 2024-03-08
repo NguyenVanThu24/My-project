@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Liệt kê</title>
+    <script>
+        var n, x = [], dem, s;
+        function show_kq() {
+            dem++;
+            s += 'Nghiệm ' + dem + ': ' + x + '\n'
+        }
+        function check_ok() {
+            //true when x include 000 | false
+            for (var i = 0; i < n - 2; i++) {
+                if (x[i] + x[i + 1] + x[i + 2] == 0) return true;
+            }
+            return false;
+        }
+        function check2_ok(j) {
+            //true when x not include 000 | false
+            if (j >= 2) {
+                for (var i = 0; i <= j - 2; i++) {
+                    if (x[i] + x[i + 1] + x[i + 2] == 0) return false;
+                }
+            }
+            return true;
+        }
+
+        //gán cho x[i] giá trị 0 hoặc 1
+        function lietke(i) {
+            for (var j = 0; j <= 1; j++) {
+                x[i] = j;
+                if (check2_ok(i)) {
+                    if (i == n - 1) {
+                        show_kq()
+                    } else {
+                        lietke(i + 1);
+                    }
+                }
+            }
+        }
+        function Giai() {
+            n = document.getElementById("do-dai").value;
+            n = parseInt(n)
+            //init vecto x gồm n bít 0
+            for (var i = 0; i < n; i++) x[i] = 0;
+            document.getElementById("liet-ke-cau-hinh").innerHTML = '';
+            dem = 0;
+            s = '';
+            lietke(0);
+            document.getElementById("dem-cau-hinh").innerHTML = 'Số cấu hình thoả mãn: ' + dem;
+            document.getElementById("liet-ke-cau-hinh").innerHTML = s;
+        }
+    </script>
+</head>
+<body>
+    <input type="number" id="do-dai" value="3" />
+    <button onclick="Giai()">Liệt kê + đếm</button>
+    <div id="dem-cau-hinh"></div>
+    <pre id="liet-ke-cau-hinh"></pre>
+</body>
+</html>

@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>CARO</title>
+    <script>
+        const MAX = 5;
+        var max_d, max_c;
+        function dem(m, d, c, hd, hc) {
+            var v = m[d][c];
+            if (d + hd > 0 && d + hd < max_d &&
+                c + hc > 0 && c + hc < max_c &&
+                m[d + hd][c + hc] == v)
+                return 1 + dem(m, d + hd, c + hc, hd, hc);
+            else
+                return 1;
+        }
+        function check(m, d, c) {
+            if (!(m[d][c] == 'X' || m[d][c] == 'O'))return false;
+            //tổng của (đếm theo 2 hướng đối nhau) : vi tri d,c bị tính 2 lần: -1 => tổng
+            var h = [[1, 1], [1, -1], [1, 0], [0, 1]]
+            for (var hi of h) {
+                var ti = dem(m, d, c, hi[0], hi[1]) + dem(m, d, c, -hi[0], -hi[1]) - 1;
+                console.log(hi[0], hi[1],'Tổng='+ti)
+                if (ti >= MAX) return true;
+            }
+            return false;
+        }
+        function CheckWin() {
+            var s = document.getElementById("ban-co").innerHTML;
+            var m = s.split('\n');
+            max_d = m.length;
+            max_c = m[0].length;
+            var d = document.getElementById("dong").value;
+            var c = document.getElementById("cot").value;
+            d = parseInt(d)
+            c = parseInt(c)
+            var ok = check(m, d, c);
+            document.getElementById("ketqua").innerHTML =m[d][c]+' tại vị trí ['+d+','+c+']: '+( ok ? 'WIN' : 'Not win')
+        }
+    </script>
+</head>
+<body>
+    <pre id="ban-co" contenteditable="true">
+012345678901234567890123456789012345678901234
+1--------------------------------------------
+2--------------------------------------------
+3--------------------------------------------
+4--------------------------------------------
+5--------------------------------------------
+6-----------------X--------------------------
+7----------------XXXXX-----------------------
+8-------------------X------------------------
+9--------------------X-----------------------
+0---------------------O----------------------
+1--------------------------------------------
+2--------------------------------------------
+3--------------------------------------------
+4--------------------------------------------
+</pre>
+    <input type="number" id="dong" value="7" />
+    <input type="number" id="cot" value="19" />
+    <button onclick="CheckWin()">Check win</button>
+    <div id="ketqua"></div>
+</body>
+</html>
